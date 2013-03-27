@@ -61,7 +61,7 @@ def main():
   count = 1
   for link in d.links:
     srt = "https://class.coursera.org/neuralnets-2012-001/lecture/subtitles?q=%s_en&format=srt" %link[0]
-    file_name = path + count + '.' +link[1]+'.srt'
+    file_name = path + str(count) + '.' +link[1]+'.srt'
     d.download(srt, file_name)
     count += 1
 
