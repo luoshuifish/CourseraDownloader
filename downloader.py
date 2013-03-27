@@ -64,10 +64,10 @@ def main():
     srt_name = path + str(count) + '.' +link[1]+'.srt'
     d.download(srt_url, srt_name)
 
-    # srt_url = "https://class.coursera.org/neuralnets-2012-001/lecture/subtitles?q=%s_en&format=srt" %link[0]
-    # srt_name = path + str(count) + '.' +link[1]+'.srt'
-    # d.download(srt_url, srt_name)
-    
+    video_url = "https://class.coursera.org/neuralnets-2012-001/lecture/download.mp4?lecture_id=%s" %link[0]
+    video_name = path + str(count) + '.' +link[1]+'.mp4'
+    d.download(video_url, video_name)
+
     count += 1
 
 if __name__ == '__main__':
