@@ -60,9 +60,14 @@ def main():
   # count作为文件名的前缀
   count = 1
   for link in d.links:
-    srt = "https://class.coursera.org/neuralnets-2012-001/lecture/subtitles?q=%s_en&format=srt" %link[0]
-    file_name = path + str(count) + '.' +link[1]+'.srt'
-    d.download(srt, file_name)
+    srt_url = "https://class.coursera.org/neuralnets-2012-001/lecture/subtitles?q=%s_en&format=srt" %link[0]
+    srt_name = path + str(count) + '.' +link[1]+'.srt'
+    d.download(srt_url, srt_name)
+
+    # srt_url = "https://class.coursera.org/neuralnets-2012-001/lecture/subtitles?q=%s_en&format=srt" %link[0]
+    # srt_name = path + str(count) + '.' +link[1]+'.srt'
+    # d.download(srt_url, srt_name)
+    
     count += 1
 
 if __name__ == '__main__':
