@@ -1,6 +1,8 @@
 ## Usage
 usage : ./downloader.py download_dir username password class_name
 
+![revolunet logo](https://raw.github.com/royguo/CourseraDownloader/master/demo.png "revolunet logo")
+
 ## Download
 
 需要注意，必须要先在coursera上enroll课程才可以下载
