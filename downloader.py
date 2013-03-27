@@ -35,7 +35,7 @@ class Downloader(object):
 
   def download(self, url, target):
     if os.path.exists(target):
-      print 'file already exist, skip.'
+      print target,' already exist, skip.'
       return
     print 'downloading : ', target
     cmd = ['curl', url, '-k', '-#', '-L', '-o', target, '--cookie',
