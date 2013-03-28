@@ -12,4 +12,4 @@ usage : ./downloader.py download_dir username password class_name
 下载过程使用curl，在linux正常运行，没测试windows。
 
 ## Issue
-不知道为何，下载过程总是会是不是的僵死，重启即可，文件已经存在的话不会重新下载，此问题正在解决中，看起来像是国内的网络问题导致。
+不知道为何，下载过程总是会时不时的僵死，重启即可，文件已经存在的话不会重新下载，此问题正在解决中，看起来像是国内的网络问题导致。
