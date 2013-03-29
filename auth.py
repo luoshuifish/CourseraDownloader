@@ -10,9 +10,10 @@ import urllib
 import urllib2
 
 class Course(object):
-  def __init__(self, username, password):
+  def __init__(self, username, password, class_name):
     self.username = username
     self.password = password
+    self.class_name = class_name
 
     # 发送登陆POST数据的接口
     self.auth_url = "https://www.coursera.org/maestro/api/user/login"
@@ -20,11 +21,14 @@ class Course(object):
     self.session = ""
     self.cookie_file = ""
 
-  def __get_class_url(self, class_name):
-      """获得当前课程的首页URL"""
-      return 'https://class.coursera.org/%s/lecture/index' % class_name
+    # 开启课程验证信息
+    self.open()
 
-  def __set_csrf(self, class_name):
+  def __get_class_url(self):
+      """获得当前课程的首页URL"""
+      return 'https://class.coursera.org/%s/lecture/index' % self.class_name
+
+  def __set_csrf(self):
     """设置登陆页面的CSRF Token"""
     # 模拟cookie行为，主要用来获得cookie中的数据，并不真正存储在本地
     cookies = cookielib.LWPCookieJar()
@@ -34,7 +38,7 @@ class Course(object):
         urllib2.HTTPCookieProcessor(cookies)
     ]
     opener = urllib2.build_opener(*handlers)
-    req = urllib2.Request(self.__get_class_url(class_name))
+    req = urllib2.Request(self.__get_class_url())
     print 'Request for csrf token...'
     opener.open(req)
     for cookie in cookies:
@@ -77,10 +81,10 @@ class Course(object):
     os.close(hn)
     self.cookie_file = fn
 
-  def __set_session(self, class_name):
+  def __set_session(self):
     """获得课程session，下载的时候需要"""  
-    target = urllib.quote_plus(self.__get_class_url(class_name))
-    auth_redirector_url = 'https://class.coursera.org/'+class_name+'/auth/auth_redirector?type=login&subtype=normal&email=&visiting='+target
+    target = urllib.quote_plus(self.__get_class_url())
+    auth_redirector_url = 'https://class.coursera.org/'+self.class_name+'/auth/auth_redirector?type=login&subtype=normal&email=&visiting='+target
     print 'redirect url : ',auth_redirector_url
     cj = cookielib.MozillaCookieJar()
     cj.load(self.cookie_file)
@@ -98,13 +102,13 @@ class Course(object):
             break
     opener.close()
 
-  def open(self, class_name):
+  def open(self):
     """登陆某个课程首页，同时在本地存储cookie，需要预先enroll课程"""
-    self.__set_csrf(class_name)
+    self.__set_csrf()
     print 'Get csrf token : ', self.csrf_token
     self.__auth()
     print 'Login in success, cookie file: ', self.cookie_file
-    self.__set_session(class_name)
+    self.__set_session()
     print 'Get session : ', self.session
 
     

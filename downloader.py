@@ -11,15 +11,18 @@ import subprocess
 
 class Downloader(object):
   """下载器,登陆后使用"""
-  def __init__(self, course):
+  def __init__(self, course, path):
     self.course = course
+    self.path = path
     # {[id, name],[id, name]}
     self.links = []
+    # 解析课程首页，获得链接信息
+    self.parse_links()
 
   def parse_links(self):
     html = 'lectures.html'
     # 下载课程首页，根据页面html抽取页面链接，应该有更好的方式实现...
-    cmd = 'curl https://class.coursera.org/neuralnets-2012-001/lecture/index -k -# -L -o ' + html + ' --cookie "csrf_token=%s; session=%s"' % (self.course.csrf_token, self.course.session)
+    cmd = 'curl https://class.coursera.org/'+self.course.class_name+'/lecture/index -k -# -L -o ' + html + ' --cookie "csrf_token=%s; session=%s"' % (self.course.csrf_token, self.course.session)
     os.system(cmd)
     with open('lectures.html','r') as f:
       arr = re.findall(r'data-lecture-id="(\d+)"|class="lecture-link">\n(.*)</a>',f.read())
@@ -32,43 +35,50 @@ class Downloader(object):
     print 'total lectures : ', len(self.links)
     os.remove(html)
 
-
   def download(self, url, target):
     if os.path.exists(target):
       print target,' already exist, skip.'
       return
     print 'downloading : ', target
+    print 'url : ', url
+    # -k : allow curl connect ssl websites without certifications.
+    # -# : display progress bar.
+    # -L : follow redirects
+    # -o : output file
+    # --cookie : String or file to read cookies from.
     cmd = ['curl', url, '-k', '-#', '-L', '-o', target, '--cookie',
            "csrf_token=%s; session=%s" % (self.course.csrf_token, self.course.session)]
     subprocess.call(cmd)
+
+  def fetchAll(self):
+    # count作为文件名的前缀遍历所有链接
+    count = 1
+    for link in self.links:
+      # 下载字幕
+      srt_url = "https://class.coursera.org/"+self.course.class_name+"/lecture/subtitles?q=%s_en&format=srt" %link[0]
+      srt_name = self.path + str(count) + '.' +link[1]+'.srt'
+      self.download(srt_url, srt_name)
+      # 下载视频
+      video_url = "https://class.coursera.org/"+self.course.class_name+"/lecture/download.mp4?lecture_id=%s" %link[0]
+      video_name = self.path + str(count) + '.' +link[1]+'.mp4'
+      self.download(video_url, video_name)
+
+      count += 1
 
 def main():
   if len(sys.argv) != 5:
     # class name example "neuralnets-2012-001"
     print 'usage : ./downloader.py download_dir username password class_name'
     return
-  path = sys.argv[1] + "/"
+  path = re.sub(r'/$','',sys.argv[1]) + "/"
   if not os.path.exists(path):
     os.makedirs(path)
   print 'download dir : ', path
 
   # 账号和课程信息
-  c = Course(sys.argv[2], sys.argv[3])
-  c.open(sys.argv[4])
-  d = Downloader(c)
-  d.parse_links()
-  # count作为文件名的前缀
-  count = 1
-  for link in d.links:
-    srt_url = "https://class.coursera.org/neuralnets-2012-001/lecture/subtitles?q=%s_en&format=srt" %link[0]
-    srt_name = path + str(count) + '.' +link[1]+'.srt'
-    d.download(srt_url, srt_name)
-
-    video_url = "https://class.coursera.org/neuralnets-2012-001/lecture/download.mp4?lecture_id=%s" %link[0]
-    video_name = path + str(count) + '.' +link[1]+'.mp4'
-    d.download(video_url, video_name)
-
-    count += 1
+  c = Course(sys.argv[2], sys.argv[3], sys.argv[4])
+  d = Downloader(c, path)
+  d.fetchAll()
 
 if __name__ == '__main__':
   main()
