@@ -1,6 +1,10 @@
 ## Usage
 usage : ./downloader.py download_dir username password class_name
 
+**download-dir**: 你要把文件下载到哪个文件夹里，可使用绝对路径或相对路径
+
+**class-name**: 你要下载的课程URL名称，如 https://class.coursera.org/neuralnets-2012-001/lecture/index 这门课，class_name就是neuralnets-2012-001
+
 ![revolunet logo](https://raw.github.com/royguo/CourseraDownloader/master/demo.png "revolunet logo")
 
 ## Download
